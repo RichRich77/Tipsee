@@ -5,48 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta author="Team a la mode: Michelle Choe, Bijan Parvin, Cindy Chu, Richard Martinez">
+    
+    <title>Tipsee Squirrel Restaurant Search</title>
+
+    <!-- reset -->
+    <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
+    <!-- link to jquery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- bulma -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <!-- font awesome -->
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <!-- bootstrap -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" -->
+    <!-- crossorigin="anonymous"> -->
+    <!-- my own styles -->
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <!-- link to firebase -->
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+    <!-- bulma carousel -->
+    <link rel="stylesheet" type="text/css" href="assets/css/bulma-carousel.min.css">
+    <!-- <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script> -->
+
+    <!-- Firebase App is always required and must be first -->
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-app.js"></script>
+
+    <!-- Add additional services that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-functions.js"></script>
 
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Lunch Selector</title>
-
-        <!-- reset -->
-        <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
-        <!-- link to jquery -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <!-- bulma -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
-        <!-- font awesome -->
-        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-        <!-- bootstrap -->
-        <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" -->
-        <!-- crossorigin="anonymous"> -->
-        <!-- my own styles -->
-        <link rel="stylesheet" type="text/css" href="assets/css/style.css">
-        <!-- link to firebase -->
-        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
-        <!-- bulma carousel -->
-        <link rel="stylesheet" type="text/css" href="assets/css/bulma-carousel.min.css">
-        <!-- <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script> -->
-
-        <!-- Firebase App is always required and must be first -->
-        <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-app.js"></script>
-
-        <!-- Add additional services that you want to use -->
-        <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-auth.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-database.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-firestore.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-messaging.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-functions.js"></script>
-
-        <!-- Comment out (or don't include) services that you don't want to use -->
-        <!-- <script src="https://www.gstatic.com/firebasejs/5.6.0/firebase-storage.js"></script> -->
-
-
-    </head>
+</head>
 
 <body>
 
