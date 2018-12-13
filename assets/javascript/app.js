@@ -5,11 +5,12 @@ var yImageLink;
 var yRestName;
 var yPrice;
 var restId;
-
+var user;
 var city;
 var state;
 var zip;
 var cuisine;
+var googleAddress;
 
 // ================ Initialize Firebase =============rom============
 var config = {
@@ -144,9 +145,8 @@ function makeRestaurantCard(yImageLink, yRestName, yRestAddress, yPrice, yRestNu
     // restAddress: str address
     // happyHours: str happyHours
     // main div card that everything goes into
-    $("#selectedRestaurant").text(yRestName);
 
-    activateBasicsTab();
+
 
     var card = $("<div>");
     card.addClass("card restaurant-card");
@@ -161,7 +161,8 @@ function makeRestaurantCard(yImageLink, yRestName, yRestAddress, yPrice, yRestNu
     // set up picture (placeholder for now) for image portion
     var img = $("<img>");
     img.addClass("restImage");
-    img.attr("src", yImageLink); // img.attr("src", imageLink); 
+    img.attr("src", yImageLink); // img.attr("src", imageLink);
+
     img.attr("alt", yRestName); //img.attr("alt", restName)
 
     // add picture to image portion.
@@ -215,6 +216,47 @@ function makeRestaurantCard(yImageLink, yRestName, yRestAddress, yPrice, yRestNu
 
     // add restaurant card to page
     addRestCard(card);
+    // RESTAURANT CARD onclick
+    card.click(function () {
+        $("#selectedRestaurant").text(yRestName);
+        // activate selected Restaurant Modal
+        $("#selResModal").toggleClass("is-active");
+        activateBasicsTab();
+        //adds image to main info modal 
+        var mainResImage = $("<img>");
+        mainResImage.attr("id", "mainResImage");
+        mainResImage.attr("src", yImageLink);
+        mainResImage.attr("alt", "Restaurant Image");
+        $("#resImageHolder").html(mainResImage);
+        //add address to main info modal 
+        $("#rAddress").html(yRestAddress);
+        googleAddress = yRestAddress;
+        //add phone number to main info modal
+        $("#rNumber").html(yRestNumber)
+        //add price to main info 
+        $("#rPrice").html(yPrice);
+        // console.log(yPrice);
+
+        //add link to menu
+
+        //add link to restaurant
+        // $("rWebLink").attr("href", )
+        var myurl = "https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/" + restId;
+        $.ajax({
+            url: myurl,
+            headers: {
+                'Authorization': 'Bearer NHvlP42MwvOCRjHVyCPDGRj0TQ-GnJlBYnZ63U-iJd85a90cehQ9rCSoGhmSRe8bx_Nr1PXb_j2AqafFnSOM2vSg_pUGsjQ0faLnr7GOs_lXWN0stah7PrFdYroFXHYx',
+            },
+            method: 'GET',
+            dataType: 'json',
+            success: function (response2) {
+                // console.log(response2);
+                //this diplays the hours in the main rest info modal 
+                $("#rHours").html(response2.hours[0].open[0].start + "-" + response2.hours[0].open[0].end)
+            }
+        });
+
+    });
 
 }
 
@@ -245,6 +287,9 @@ var input = document.getElementById('passwordInput');
 var input2 = document.getElementById('usernameInput');
 var input3 = document.getElementById('citySearch');
 var input4 = document.getElementById('startLocation');
+var input4 = document.getElementById('stateSearch');
+var input4 = document.getElementById('zipSearch');
+
 
 
 input.addEventListener("keyup", function (event) {
@@ -271,7 +316,18 @@ input4.addEventListener("keyup", function (event) {
         document.getElementById('directionSubmitButton').click();
     }
 });
-//=================================================
+input2.addEventListener("keyup", function (event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        document.getElementById('submitSearch').click();
+    }
+});
+input2.addEventListener("keyup", function (event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        document.getElementById('submitSearch').click();
+    }
+});
 
 
 // global variables
@@ -279,16 +335,17 @@ var cardCount = 0;
 var rowCount = 0;
 var currRow;
 
-// SIGN IN MODAL form validation
-function isEmail(email) {
-    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-    return regex.test(email);
-}
+// SIGN IN MODAL form validation, close & submit
 
-// SIGN IN MODAL close & submit
 $(".closeSignInModal").click(function () {
+
     var errorMessage = "";
     var fieldsMissing = "";
+
+    function isEmail(email) {
+        var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        return regex.test(email);
+    };
 
 
     if ($("#usernameInput").val() == "") {
@@ -299,7 +356,7 @@ $(".closeSignInModal").click(function () {
         fieldsMissing += "<br>Password";
     };
 
-    if (fieldsMissing != "") {
+    if (fieldsMissing !== "") {
         errorMessage += "<p>The following field(s) are missing: " + fieldsMissing;
     };
 
@@ -307,11 +364,15 @@ $(".closeSignInModal").click(function () {
         errorMessage += "<p>Your email address is not valid</p>";
     };
 
-    if (errorMessage != "") {
-        $(".modal-card-title").html(errorMessage);
+    if (errorMessage !== "") {
+
+        if ($('.modal-card-title').text().length === 9) {
+            $('.modal-card-title').append('<p><font color="red">' + errorMessage);
+        };
+        $("#signInModal").toggleClass("is-active");
     };
 
-    if (fieldsMissing != "") {
+    if (fieldsMissing !== "") {
         errorMessage += "<p>The following field(s) are missing: " + fieldsMissing;
     }
 
@@ -348,6 +409,7 @@ $(".closeSignInModal").click(function () {
                 event.preventDefault();
                 var email = $('#usernameInput').val();
                 var password = $('#passwordInput').val();
+                var user = firebase.auth().currentUser;
 
                 if (!email || !password) {
                     return console.log('email and password required');
@@ -355,43 +417,47 @@ $(".closeSignInModal").click(function () {
 
                 firebase.auth().createUserWithEmailAndPassword(email, password).catch(function (error) {
                     console.log('register error', error);
-                    if (error.code === 'auth/email-already-in-use') {
+                        if (error.code === 'auth/email-already-in-use') {
                         var credential = firebase.auth.EmailAuthProvider.credential(email, password);
-                    }
-                });
+                            if (!$('#newAccountTarget').innerHTML) {
+                            $('#newAccountTarget').html('Sorry squirrel, this name is already in use!');
+                            };
+                        };
+                    });
+                        $('#newAccountTarget').html('<-- Welcome Squirrel! Press Submit to explore!');
 
+
+                Event.stop(event);
             };
 
-            // =========================================================
+        };
 
-            // Capture and send data to Firebase
-            // var database = firebase.database();
-            // database.ref().push({
-            //     Name: $('#usernameInput').val(),
-            //     Password: $('#passwordInput').val()
-            // });
+        $("#signInModal").toggleClass("is-active");
 
-            $("#signInModal").toggleClass("is-active");
-        }
+
+
+        //prevent page from refresing when form tries to submit itself 
+        event.preventDefault();
+
+        var email = $('#usernameInput').val().trim();
+
+        //console log each of the user 
+        // console.log(email);
+        $("welcome").text(email);
+
+        //local storage clear
+        localStorage.clear();
+
+        //Store all content into localStorage 
+        localStorage.setItem("email", email);
+
+        $("#welcome").text(localStorage.getItem("email"));
+
     };
 
-    //prevent page from refresing when form tries to submit itself 
-    event.preventDefault();
-
-    var email = $('#usernameInput').val().trim();
-
-    //console log each of the user 
-    console.log(email);
-    $("welcome").text(email);
-
-    //local storage clear
-    localStorage.clear();
-
-    //Store all content into localStorage 
-    localStorage.setItem("email", email);
-
-    $("#welcome").text(localStorage.getItem("email"));
 });
+
+
 $("#welcome").text(localStorage.getItem("email"));
 
 // SEARCH FORM submit
@@ -405,45 +471,7 @@ $(document).on("click", "#submitSearch", function () {
 // SEARCH FORM clear
 $(document).on("click", "#clearSearch", clearSearchForm);
 
-// RESTAURANT CARD onclick
-$(document).on("click", ".restaurant-card", function () {
-    // activate selected Restaurant Modal
-    $("#selResModal").toggleClass("is-active");
-    activateBasicsTab();
-    //adds image to main info modal 
-    var mainResImage = $("<img>");
-    mainResImage.attr("id", "mainResImage");
-    mainResImage.attr("src", yImageLink);
-    mainResImage.attr("alt", "Restaurant Image");
-    $("#resImageHolder").html(mainResImage);
-    //add address to main info modal 
-    $("#rAddress").html(yRestAddress);
-    //add phone number to main info modal
-    $("#rNumber").html(yRestNumber)
-    //add price to main info 
-    $("#rPrice").html(yPrice);
-    // console.log(yPrice);
 
-    //add link to menu
-
-    //add link to restaurant
-    // $("rWebLink").attr("href", )
-    var myurl = "https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/" + restId;
-    $.ajax({
-        url: myurl,
-        headers: {
-            'Authorization': 'Bearer NHvlP42MwvOCRjHVyCPDGRj0TQ-GnJlBYnZ63U-iJd85a90cehQ9rCSoGhmSRe8bx_Nr1PXb_j2AqafFnSOM2vSg_pUGsjQ0faLnr7GOs_lXWN0stah7PrFdYroFXHYx',
-        },
-        method: 'GET',
-        dataType: 'json',
-        success: function (response2) {
-            // console.log(response2);
-            //this diplays the hours in the main rest info modal 
-            $("#rHours").html(response2.hours[0].open[0].start + "-" + response2.hours[0].open[0].end)
-        }
-    });
-
-});
 
 // RESTAURANT MODAL close
 $(document).on("click", "#closeSelResModal", function () {
@@ -490,12 +518,11 @@ function activateBasicsTab() {
         $("#directionsTabContent").attr("style", "display:none")
     }
     // if this tab is active, just return
-    else if ($("#selResBasic").hasClass("is-active")) {
+    else if ($("#selResBasics").hasClass("is-active")) {
         return;
     }
-
     // activate this tab.
-    $("#selResBasic").toggleClass("is-active");
+    $("#selResBasics").toggleClass("is-active");
 
     // show tab content
     $("#basicTabContent").removeAttr("style");
@@ -508,8 +535,9 @@ $(document).on("click", "#selResPictures", activatePicturesTab);
 
 function activatePicturesTab() {
     // deactivate other tab. hide other tab content
-    if ($("#selResBasic").hasClass("is-active")) {
-        $("#selResBasic").toggleClass("is-active");
+    if ($("#selResBasics").hasClass("is-active")) {
+        $("#selResBasics").toggleClass("is-active");
+
         $("#basicTabContent").attr("style", "display:none")
     }
     else if ($("#selResMenu").hasClass("is-active")) {
@@ -542,8 +570,8 @@ $(document).on("click", "#selResMenu", activateMenuTab);
 
 function activateMenuTab() {
     // deactivate other tab. hide other tab content
-    if ($("#selResBasic").hasClass("is-active")) {
-        $("#selResBasic").toggleClass("is-active");
+    if ($("#selResBasics").hasClass("is-active")) {
+        $("#selResBasics").toggleClass("is-active");
         $("#basicTabContent").attr("style", "display:none")
     }
     else if ($("#selResPictures").hasClass("is-active")) {
@@ -559,11 +587,16 @@ function activateMenuTab() {
         return;
     }
 
+    var menuImg = $("<img>")
+    menuImg.attr("src", "http://2.bp.blogspot.com/-qFpiuhpv0UE/UxokalWN24I/AAAAAAAANmQ/YQKSM__mFF0/s1600/ES-MainMenu-page-001.jpg");
+    $("#menuImg").html(menuImg);
     // activate this tab.
     $("#selResMenu").toggleClass("is-active");
 
     // show tab content
     $("#menuTabContent").removeAttr("style");
+
+
 }
 
 
@@ -571,8 +604,8 @@ $(document).on("click", "#selResDirections", activateDirectionsTab);
 
 function activateDirectionsTab() {
     // deactivate other tab. hide other tab content
-    if ($("#selResBasic").hasClass("is-active")) {
-        $("#selResBasic").toggleClass("is-active");
+    if ($("#selResBasics").hasClass("is-active")) {
+        $("#selResBasics").toggleClass("is-active");
         $("#basicTabContent").attr("style", "display:none")
     }
     else if ($("#selResPictures").hasClass("is-active")) {
@@ -611,7 +644,7 @@ function fillPicturesContent() {
     var foodImageLinkArg = "https://bulma.io/images/placeholders/640x480.png";
     var foodImageAltArg = "alt alt alt";
 
-    makeFoodImageCard(foodImageLinkArg, foodImageAltArg);
+
     makeFoodImageCard("http://www.studyabroadcorner.com/wp-content/uploads/2015/06/Fast-food.jpg", "a");
 
     makeFoodImageCard("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Eggs-as-food.jpg/1200px-Eggs-as-food.jpg", "b");
@@ -619,14 +652,7 @@ function fillPicturesContent() {
     makeFoodImageCard("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Momo_nepal.jpg/1200px-Momo_nepal.jpg", "c");
 
     makeFoodImageCard("http://thenextweb.com/wp-content/blogs.dir/1/files/2012/10/Food.jpg", "d");
-    makeFoodImageCard(foodImageLinkArg, "e");
-    makeFoodImageCard(foodImageLinkArg, "f");
-    makeFoodImageCard(foodImageLinkArg, "g");
-    makeFoodImageCard(foodImageLinkArg, "h");
-    makeFoodImageCard(foodImageLinkArg, "i");
-    makeFoodImageCard(foodImageLinkArg, "j");
-    makeFoodImageCard(foodImageLinkArg, "k");
-    makeFoodImageCard(foodImageLinkArg, "l");
+
 
 }
 
@@ -703,7 +729,7 @@ $(document).on("click", "#directionsSubmitButton", function () {
     //api key for google
     var apiKeyGoogle = "AIzaSyDlIhSIHh3DOCgKFekiOXVtnGCzdkGdxlE"
     //destination equal to 
-    var destination = yRestAddress
+    var destination = googleAddress
     // console.log(yRestAddress)
     //origin equal to
     var origin = $("#startLocation").val().trim();
@@ -713,7 +739,7 @@ $(document).on("click", "#directionsSubmitButton", function () {
     var imageDiv = $("<div>");
     imageDiv.html("<iframe width='450' height='250' frameborder='0' style='border:0' src='" + googleDirectionsUrl + "' allowfullscreen></iframe>");
 
-    $("#directionsTabContent").append(imageDiv);
+    $("#directionsTabContent").html(imageDiv);
 })
 
 $(document).ready(function () {
@@ -785,4 +811,5 @@ function thumbs() {
         });
     });
 };
+thumbs();
 //============================================================================
